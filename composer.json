@@ -1,0 +1,36 @@
+{
+  "name": "pingframework/boot",
+  "description": "Ping is a basic port of java spring framework in PHP",
+  "keywords": [
+    "ping",
+    "framework"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Oleg Bronzov",
+      "email": "oleg.bronzov@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "psr/container": "1.0.0",
+    "ps/fluent-traversable": "^0.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pingframework\\Ping\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Pingframework\\Ping\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "tests": "phpunit --coverage-clover=coverage.xml"
+  }
+}
