@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace Pingframework\Ping\DependencyContainer\Builder;
 
-use FluentTraversable\Semantics\get;
 use Pingframework\Ping\Annotations\Autowired;
 use Pingframework\Ping\Annotations\Service;
 use Pingframework\Ping\DependencyContainer\ArgumentInjector;
@@ -68,7 +67,7 @@ class ContainerBuilder
 
         // set up service definitions
         $c = new DependencyContainer(
-            $rs->getVdm(),
+            $rs,
             new ArgumentInjector(),
             $definitions,
         );
