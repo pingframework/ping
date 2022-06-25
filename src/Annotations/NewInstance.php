@@ -40,12 +40,8 @@ use ReflectionProperty;
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
-class Inject implements Injector
+class NewInstance implements Injector
 {
-    public function __construct(
-        public readonly ?string $service = null
-    ) {}
-
     /**
      * Returns value to be injected.
      *
@@ -68,57 +64,13 @@ class Inject implements Injector
         ReflectionParameter|ReflectionProperty $rp,
         array                                  $runtime
     ): mixed {
-        $id = $this->findId($rm, $rp);
-
-        if ($rp instanceof ReflectionParameter && $rp->isVariadic() && $rm->isConstructor()) {
-            return Arrays::stream($vdm->get($rc->getName()))
-                ->map(fn(string $id): object => $c->get($id))
-                ->toArray();
-        }
-
-        if (isset($runtime[$id])) {
-            return $runtime[$id];
-        }
-
-        if ($c->has($id)) {
-            return $c->get($id);
-        }
-
-        $isOptional = $rp instanceof ReflectionParameter ? $rp->isOptional() : $rp->hasDefaultValue();
-
-        if ($isOptional) {
-            return $rp->getDefaultValue();
-        }
-
-        $this->throw($rm, $rp);
-    }
-
-    /**
-     * @throws DependencyContainerException
-     */
-    protected function findId(
-        ?ReflectionMethod                      $rm,
-        ReflectionParameter|ReflectionProperty $rp
-    ): string {
-        if ($this->service !== null) {
-            return $this->service;
-        }
-
         $rt = $rp->getType();
 
-        if ($rp instanceof ReflectionParameter && $rp->isVariadic() && !$rm->isConstructor()) {
+        if (!$rt instanceof ReflectionNamedType || $rt->isBuiltin()) {
             $this->throw($rm, $rp);
         }
 
-        if ($rt->isBuiltin()) {
-            return Strings::camelCaseToUnderscore($rp->getName());
-        }
-
-        if ($rt instanceof ReflectionNamedType) {
-            return $rt->getName();
-        }
-
-        $this->throw($rm, $rp);
+        return $c->make($rt->getName(), $runtime);
     }
 
     /**

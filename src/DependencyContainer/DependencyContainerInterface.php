@@ -63,12 +63,13 @@ interface DependencyContainerInterface extends ContainerInterface
      * It is not storing new instance of the object into resolved internal map.
      *
      * @param string $serviceClass
+     * @param array  $runtime
      * @return object
      * @throws ServiceResolveException
      * @throws ServiceNotFoundException
      * @throws DependencyContainerException
      */
-    public function make(string $serviceClass): object;
+    public function make(string $serviceClass, array $runtime = []): object;
 
     /**
      * Calls object method with automatically resolved arguments.

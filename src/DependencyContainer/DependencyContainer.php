@@ -100,19 +100,18 @@ class DependencyContainer implements DependencyContainerInterface
      * It is not storing new instance of the object into resolved internal map.
      *
      * @param string $serviceClass
+     * @param array  $runtime
      * @return object
-     * @throws ServiceResolveException
-     * @throws ServiceNotFoundException
      * @throws DependencyContainerException
      */
-    public function make(string $serviceClass): object
+    public function make(string $serviceClass, array $runtime = []): object
     {
         try {
             $rc = new ReflectionClass($serviceClass);
             $args = [[], []];
             $constructor = $rc->getConstructor();
             if ($constructor !== null) {
-                $args = $this->ai->findArguments($this, $this->vdm, $serviceClass, $constructor->getName(), []);
+                $args = $this->ai->findArguments($this, $this->vdm, $serviceClass, $constructor->getName(), $runtime);
             }
             $service = $rc->newInstance(...$args[0], ...$args[1]);
         } catch (ReflectionException $e) {
