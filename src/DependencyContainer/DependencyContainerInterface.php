@@ -35,6 +35,7 @@ declare(strict_types=1);
 namespace Pingframework\Ping\DependencyContainer;
 
 
+use Pingframework\Ping\DependencyContainer\Builder\AttributeScanner\AttributeScannerResultSet;
 use Pingframework\Ping\DependencyContainer\Definition\VariadicDefinitionMap;
 use Psr\Container\ContainerInterface;
 
@@ -98,5 +99,5 @@ interface DependencyContainerInterface extends ContainerInterface
      */
     public function get($id): mixed;
 
-    public function getVariadicDefinitionMap(): VariadicDefinitionMap;
+    public function getAttributeScannerResultSet(): AttributeScannerResultSet;
 }

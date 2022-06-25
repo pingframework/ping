@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace Pingframework\Ping\DependencyContainer;
 
 use Pingframework\Ping\Annotations\Autowired;
-use Pingframework\Ping\DependencyContainer\Definition\VariadicDefinitionMap;
+use Pingframework\Ping\DependencyContainer\Builder\AttributeScanner\AttributeScannerResultSet;
 use Psr\Container\ContainerInterface;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -43,18 +43,18 @@ class DependencyContainer implements DependencyContainerInterface
     private array $resolved = [];
 
     public function __construct(
-        private readonly VariadicDefinitionMap $vdm,
-        private readonly ArgumentInjector      $ai,
-        private readonly array                 $definitions = [],
+        private readonly AttributeScannerResultSet $rs,
+        private readonly ArgumentInjector          $ai,
+        private readonly array                     $definitions = [],
     ) {
         $this->resolved[ContainerInterface::class] = $this;
         $this->resolved[DependencyContainerInterface::class] = $this;
         $this->resolved[static::class] = $this;
     }
 
-    public function getVariadicDefinitionMap(): VariadicDefinitionMap
+    public function getAttributeScannerResultSet(): AttributeScannerResultSet
     {
-        return $this->vdm;
+        return $this->rs;
     }
 
     /**
@@ -116,7 +116,7 @@ class DependencyContainer implements DependencyContainerInterface
             $args = [[], []];
             $constructor = $rc->getConstructor();
             if ($constructor !== null) {
-                $args = $this->ai->findArguments($this, $this->vdm, $serviceClass, $constructor->getName(), $runtime);
+                $args = $this->ai->findArguments($this, $this->rs->getVdm(), $serviceClass, $constructor->getName(), $runtime);
             }
             $service = $rc->newInstance(...$args[0], ...$args[1]);
         } catch (ReflectionException $e) {
@@ -154,7 +154,7 @@ class DependencyContainer implements DependencyContainerInterface
     public function call(object $service, string $methodName, array $runtime = []): mixed
     {
         try {
-            $args = $this->ai->findArguments($this, $this->vdm, $service::class, $methodName, $runtime);
+            $args = $this->ai->findArguments($this, $this->rs->getVdm(), $service::class, $methodName, $runtime);
         } catch (ReflectionException $e) {
             throw new DependencyContainerException($e->getMessage(), $e->getCode(), $e);
         }
