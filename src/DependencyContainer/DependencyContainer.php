@@ -52,6 +52,11 @@ class DependencyContainer implements DependencyContainerInterface
         $this->resolved[static::class] = $this;
     }
 
+    public function getVariadicDefinitionMap(): VariadicDefinitionMap
+    {
+        return $this->vdm;
+    }
+
     /**
      * Push resolved service into dependency container.
      * Replaces already existing resolved service if any.

@@ -35,6 +35,7 @@ declare(strict_types=1);
 namespace Pingframework\Ping\DependencyContainer;
 
 
+use Pingframework\Ping\DependencyContainer\Definition\VariadicDefinitionMap;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -96,4 +97,6 @@ interface DependencyContainerInterface extends ContainerInterface
      * @throws DependencyContainerException
      */
     public function get($id): mixed;
+
+    public function getVariadicDefinitionMap(): VariadicDefinitionMap;
 }
