@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace Pingframework\Ping\DependencyContainer\Builder;
 
 use Pingframework\Ping\Annotations\Autowired;
+use Pingframework\Ping\Annotations\MethodRegistrar;
 use Pingframework\Ping\Annotations\Service;
 use Pingframework\Ping\DependencyContainer\ArgumentInjector;
 use Pingframework\Ping\DependencyContainer\Builder\AttributeScanner\AttributeScanner;
@@ -52,15 +53,24 @@ class ContainerBuilder
         $scanner = new AttributeScanner();
         $rs = $scanner->scan($namespaces, $excludeRegexp);
         $definitions = [];
+        $methodRegistrars = [];
 
         foreach ($rs->getAcdm()->get(Service::class, true) as $rc) {
             $definitions[$rc->getName()] = $rc->getName();
 
+            // register aliases
             foreach ($rc->getAttributes(Service::class, ReflectionAttribute::IS_INSTANCEOF) as $ra) {
                 /** @var Service $s */
                 $s = $ra->newInstance();
                 foreach ($s->aliases as $alias) {
                     $definitions[$alias] = $rc->getName();
+                }
+            }
+
+            // find all methods registrars
+            foreach ($rc->getMethods() as $rm) {
+                foreach ($rm->getAttributes(MethodRegistrar::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                    $methodRegistrars[] = [$attribute->newInstance(), $rc, $rm];
                 }
             }
         }
@@ -100,6 +110,10 @@ class ContainerBuilder
         )->each(function (ReflectionClass $rc) use ($c): void {
             $c->get($rc->getName());
         });
+
+        foreach ($methodRegistrars as $methodRegistrarRow) {
+            $methodRegistrarRow[0]->registerMethod($c, $methodRegistrarRow[1], $methodRegistrarRow[2]);
+        }
 
         return $c;
     }

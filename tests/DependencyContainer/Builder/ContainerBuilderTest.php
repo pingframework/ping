@@ -30,5 +30,13 @@ class ContainerBuilderTest extends TestCase
         $ts5 = $c->get(TestService5::class);
         $this->assertInstanceOf(TestService5::class, $ts5);
         $this->assertInstanceOf(TestService7::class, $ts5->testService7);
+
+        $tmr = $c->get(TestMethodRegistry::class);
+        $this->assertIsArray($tmr->getMap());
+        $this->assertArrayHasKey('k1', $tmr->getMap());
+        $c->call($c->get($tmr->getMap()['k1'][0]), $tmr->getMap()['k1'][1]);
+
+        $ts8 = $c->get(TestService8::class);
+        $this->assertInstanceOf(TestService1::class, $ts8->testService1);
     }
 }
