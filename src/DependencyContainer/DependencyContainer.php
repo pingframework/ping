@@ -177,12 +177,12 @@ class DependencyContainer implements DependencyContainerInterface
      */
     public function get($id): mixed
     {
-        if (isset($this->resolved[$id])) {
-            return $this->resolved[$id];
-        }
-
         if (isset($this->definitions[$id])) {
             $id = $this->definitions[$id];
+        }
+
+        if (isset($this->resolved[$id])) {
+            return $this->resolved[$id];
         }
 
         $this->resolved[$id] = $this->make($id);
