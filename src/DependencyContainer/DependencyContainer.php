@@ -23,12 +23,14 @@ declare(strict_types=1);
 namespace Pingframework\Ping\DependencyContainer;
 
 use Pingframework\Ping\Annotations\Autowired;
+use Pingframework\Ping\Annotations\Injector;
 use Pingframework\Ping\DependencyContainer\Builder\AttributeScanner\AttributeScannerResultSet;
 use Psr\Container\ContainerInterface;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionProperty;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
@@ -121,6 +123,24 @@ class DependencyContainer implements DependencyContainerInterface
             $service = $rc->newInstance(...$args[0], ...$args[1]);
         } catch (ReflectionException $e) {
             throw new DependencyContainerException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        foreach ($rc->getProperties() as $rp) {
+            if ($rp->isPromoted()) {
+                continue;
+            }
+
+            foreach ($rp->getAttributes(Injector::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                $rp->setValue($service, $attribute->newInstance()->inject(
+                    $this,
+                    $this->getAttributeScannerResultSet()->getVdm(),
+                    $rc,
+                    null,
+                    $rp,
+                    []
+                ));
+                break;
+            }
         }
 
         foreach ($rc->getMethods() as $rm) {

@@ -36,6 +36,9 @@ use Pingframework\Ping\DependencyContainer\DependencyContainerInterface;
 #[DependencyContainerConfigurator]
 class TestService5 implements \Pingframework\Ping\DependencyContainer\Builder\DependencyContainerConfigurator
 {
+    #[Inject]
+    public readonly TestService1 $testService1;
+
     public function __construct(
         #[Inject('ts7')]
         public readonly TestService7 $testService7,
