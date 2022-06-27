@@ -5,14 +5,20 @@ namespace Pingframework\Ping\Tests\DependencyContainer\Builder;
 use PHPUnit\Framework\TestCase;
 use Pingframework\Ping\DependencyContainer\Builder\ContainerBuilder;
 use Pingframework\Ping\DependencyContainer\DependencyContainerInterface;
+use ReflectionObject;
 
 class ContainerBuilderTest extends TestCase
 {
 
     public function testBuild()
     {
-        $c = ContainerBuilder::build([]);
+        $c = ContainerBuilder::build([], processAutowiredServices: true);
         $this->assertInstanceOf(DependencyContainerInterface::class, $c);
+
+        $ro = new ReflectionObject($c);
+        $rp = $ro->getProperty('resolved');
+        $resolved = $rp->getValue($c);
+        $this->assertArrayHasKey(TestService4::class, $resolved);
 
         $ts2 = $c->get(TestService2::class);
         $this->assertInstanceOf(TestService2::class, $ts2);

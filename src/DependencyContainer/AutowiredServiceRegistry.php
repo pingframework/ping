@@ -20,24 +20,23 @@
 
 declare(strict_types=1);
 
-namespace Pingframework\Ping\Annotations;
+namespace Pingframework\Ping\DependencyContainer;
 
-use Attribute;
-use Pingframework\Ping\DependencyContainer\AutowiredServiceRegistry;
-use Pingframework\Ping\Utils\Priority;
+use Pingframework\Ping\Annotations\Service;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
  * @copyright 2022
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-class Autowired extends Variadic
+#[Service]
+class AutowiredServiceRegistry
 {
+    public readonly array $services;
+
     public function __construct(
-        int   $priority = Priority::NORMAL,
-        array $aliases = []
+        object ...$service
     ) {
-        parent::__construct([AutowiredServiceRegistry::class], $priority, $aliases);
+        $this->services = $service;
     }
 }

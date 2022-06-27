@@ -26,6 +26,7 @@ use Pingframework\Ping\Annotations\Autowired;
 use Pingframework\Ping\Annotations\MethodRegistrar;
 use Pingframework\Ping\Annotations\Service;
 use Pingframework\Ping\DependencyContainer\ArgumentInjector;
+use Pingframework\Ping\DependencyContainer\AutowiredServiceRegistry;
 use Pingframework\Ping\DependencyContainer\Builder\AttributeScanner\AttributeScanner;
 use Pingframework\Ping\DependencyContainer\DependencyContainer;
 use Pingframework\Ping\DependencyContainer\DependencyContainerException;
@@ -44,7 +45,11 @@ class ContainerBuilder
     /**
      * @throws DependencyContainerException
      */
-    public static function build(array $namespaces, ?string $excludeRegexp = null): DependencyContainerInterface
+    public static function build(
+        array   $namespaces,
+        ?string $excludeRegexp = null,
+        bool    $processAutowiredServices = true
+    ): DependencyContainerInterface
     {
         if (!in_array('Pingframework', $namespaces)) {
             $namespaces[] = 'Pingframework';
@@ -102,14 +107,9 @@ class ContainerBuilder
         });
 
         // resolve autowire services
-        Arrays::stream(
-            $rs->getAcdm()->get(
-                Autowired::class,
-                true
-            )
-        )->each(function (ReflectionClass $rc) use ($c): void {
-            $c->get($rc->getName());
-        });
+        if ($processAutowiredServices) {
+            $c->get(AutowiredServiceRegistry::class);
+        }
 
         foreach ($methodRegistrars as $methodRegistrarRow) {
             $methodRegistrarRow[0]->registerMethod($c, $methodRegistrarRow[1], $methodRegistrarRow[2]);
