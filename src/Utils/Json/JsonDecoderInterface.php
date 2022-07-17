@@ -38,12 +38,37 @@ interface JsonDecoderInterface
 {
     /**
      * Converts json string into PHP array.
+     * Expects that jsonString is a valid array convertable string.
+     * If jsonString is null and default is passed, returns a default value or throws a JsonException otherwise.
      *
-     * @param string $jsonString
+     * @param string|null $jsonString
+     * @param array|null  $default
      *
      * @return array
      *
      * @throws JsonException in case when can't decode json string.
      */
-    public function unmarshal(string $jsonString): array;
+    public function unmarshal(?string $jsonString, ?array $default = null): array;
+
+    /**
+     * Decodes a JSON string
+     *
+     * @link https://php.net/manual/en/function.json-decode.php
+     *
+     * This function only works with UTF-8 encoded strings.
+     * PHP implements a superset of
+     * JSON - it will also encode and decode scalar types and NULL. The JSON standard
+     * only supports these values when they are nested inside an array or an object.
+     *
+     * @param string|null $jsonString The json string being decoded.
+     *
+     * @return mixed the value encoded in json in appropriate PHP type.
+     * Values true, false and null (case-insensitive) are returned as TRUE, FALSE
+     * and NULL respectively. NULL is returned if the
+     * json cannot be decoded or if the encoded
+     * data is deeper than the recursion limit.
+     *
+     * @throws JsonException
+     */
+    public function unmarshalMixed(?string $jsonString): mixed;
 }
