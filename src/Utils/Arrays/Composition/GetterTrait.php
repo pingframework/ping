@@ -43,7 +43,7 @@ trait GetterTrait
      */
     public static function isExists(array $array, string $key): bool
     {
-        return isset($array[$key]);
+        return array_key_exists($key, $array);
     }
 
     /**
