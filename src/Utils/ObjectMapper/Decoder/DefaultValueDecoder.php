@@ -60,6 +60,11 @@ class DefaultValueDecoder extends AbstractValueDecoder
     ): mixed {
         $key = $this->getKey($mp, $rp->getName());
         $isExists = $this->arrayGetterHelper->isExists($payload, $key);
+
+        if ($isExists && is_null($payload[$key])) {
+            return null;
+        }
+
         $hasDefaultValue = $this->hasDefaultValue($rp);
 
         if (!$hasDefaultValue && !$isExists) {
